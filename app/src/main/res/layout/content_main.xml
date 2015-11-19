@@ -9,4 +9,19 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior" tools:showIn="@layout/app_bar_main"
     tools:context="org.nwgreens.savings.savingsandblown.MainActivity">
 
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+            <TextView android:text="@string/currentBalance"
+                android:textStyle="bold"/>
+            <TextView android:id="@+id/currentBalance"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/actualBalance"
+                android:textStyle="bold"/>
+            <TextView android:id="@+id/actualBalance"/>
+        </TableRow>
+    </TableLayout>
+
 </RelativeLayout>

@@ -18,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity
 
     public CookieManager mCookieManager;
     public NavigationView navigationView;
-    public BankNameTask bankNameTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,66 +70,77 @@ public class MainActivity extends AppCompatActivity
 
 
 
-
     }
 
     private void SetupNavigationTray() {
-       navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        bankNameTask = new BankNameTask(getIntent());
-        bankNameTask.execute((Void)null);
+        GetBankNames();
     }
 
-    public class BankNameTask extends AsyncTask<Void, Void, Void>
-    {
-        Intent currentIntent;
-        String[] banks = null;
+    protected Void GetBankNames() {
+        RequestQueue rq = MySingleton.getInstance(getApplicationContext()).getRequestQueue();
+        GsonRequest<BanksResponse> gr = new GsonRequest<BanksResponse>(Request.Method.GET, BanksResponse.class,
+                String.format("%sbanks", getApplicationContext().getResources().getText(R.string.url)),
+                new Response.Listener<BanksResponse>() {
+                    @Override
+                    public void onResponse(BanksResponse response) {
+                        try {
+                            String[] banks = response.GetBanks();
+                            Menu m = navigationView.getMenu();
+                            SubMenu subMenu = m.addSubMenu(Menu.NONE, Menu.NONE, 1, "Banks");
+                            for(int i = 0; i < banks.length; i++){
+                                subMenu.add(banks[i]);
+                            }
 
-        public BankNameTask(Intent i){
-            currentIntent = i;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            RequestQueue rq = MySingleton.getInstance(getApplicationContext()).getRequestQueue();
-
-            StringRequest sr = new StringRequest(Request.Method.GET,  String.format("%sbanks", getApplicationContext().getResources().getText(R.string.url)),
-                     new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    try {
-                        Gson gson = new Gson();
-                        BanksResponse banksResponse = gson.fromJson(response, BanksResponse.class);
-
-                        banks = banksResponse.GetBanks();
+                            GetBankData(banks[0]);
+                        }
+                        catch(Exception ex){
+                            // banks = new String[0];
+                        }
                     }
-                    catch(Exception ex){
-                        banks = new String[0];
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    banks = new String[0];
-                }
-            }
-
-            );
-            rq.add(sr);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void a)
-        {
-            Menu m = navigationView.getMenu();
-            SubMenu subMenu = m.addSubMenu(Menu.NONE, Menu.NONE,1, "Banks");
-            for(int i = 0; i < banks.length; i++){
-                subMenu.add(banks[i]);
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast t = Toast.makeText(getApplicationContext(), "Error getting banks", Toast.LENGTH_LONG);
+                t.show();
             }
         }
 
+        );
+        rq.add(gr);
+        return null;
+    }
 
+    protected Void GetBankData(String bankName) {
+        RequestQueue rq = MySingleton.getInstance(getApplicationContext()).getRequestQueue();
+        GsonRequest<Bank> gr = new GsonRequest<Bank>(Request.Method.GET, Bank.class,
+                String.format("%sbanks/%s?PageNumber=1&StatusFilter=&CategoryFilter=&ShowFutureItems=true", getApplicationContext().getResources().getText(R.string.url), bankName),
+                new Response.Listener<Bank>() {
+                    @Override
+                    public void onResponse(Bank response) {
+                        try {
+                            TextView actual = (TextView) findViewById(R.id.actualBalance);
+                            actual.setText(String.format("%.2f%n", response.getTotal().getActualBalance()));
+
+                            TextView current = (TextView) findViewById(R.id.currentBalance);
+                            current.setText(String.format("%.2f%n", response.getTotal().getClearedBalance()));
+                        }
+                        catch(Exception ex){
+                            // banks = new String[0];
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast t = Toast.makeText(getApplicationContext(), "Error getting banks", Toast.LENGTH_LONG);
+                t.show();
+            }
+        }
+
+        );
+        rq.add(gr);
+        return null;
     }
 
     @Override

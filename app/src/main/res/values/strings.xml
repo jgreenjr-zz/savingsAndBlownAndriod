@@ -23,4 +23,6 @@
     <string name="action_settings">Settings</string>
 
     <string name="url">https://10.0.0.13/</string>
+    <string name="currentBalance">Current Balance</string>
+    <string name="actualBalance">Actual Balance</string>
 </resources>
