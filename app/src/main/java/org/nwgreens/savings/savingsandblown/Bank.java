@@ -1,5 +1,9 @@
 package org.nwgreens.savings.savingsandblown;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created by root on 11/16/15.
  */
@@ -8,8 +12,8 @@ public class Bank {
 
     private Transaction[] Transactions;
 
-    public Transaction[] getTransactions() {
-        return Transactions;
+    public ArrayList<Transaction> getTransactions() {
+        return new ArrayList<>(Arrays.asList(Transactions));
     }
 
     public void setTransactions(Transaction[] transactions) {

@@ -17,8 +17,9 @@ public class Transaction {
     private String UpdateDate;
     private String id;
     private Balance balance;
+    private boolean TipNeeded;
 
-    public String GetPayee(){
+    public String getPayee(){
         return payee;
     }
 
@@ -105,6 +106,14 @@ public class Transaction {
 
     public void setBalance(Balance balance) {
         this.balance = balance;
+    }
+
+    public void setTipNeeded(boolean tipNeeded) {
+        this.TipNeeded = tipNeeded;
+    }
+
+    public boolean isTipNeeded() {
+        return TipNeeded;
     }
 }
 

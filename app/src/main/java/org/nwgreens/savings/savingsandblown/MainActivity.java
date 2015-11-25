@@ -1,5 +1,6 @@
 package org.nwgreens.savings.savingsandblown;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,8 +42,10 @@ import java.net.URI;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int ADD_TRANSACTION_CLOSED = 101;
     public CookieManager mCookieManager;
     public NavigationView navigationView;
+    public String currentBank;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +59,10 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+               Intent i = new Intent(getApplicationContext(), AddTransaction.class);
+                i.putExtra("currentBank", currentBank );
+
+                startActivityForResult(i, ADD_TRANSACTION_CLOSED);
             }
         });
 
@@ -93,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                                 subMenu.add(banks[i]);
                             }
 
-                            GetBankData(banks[0]);
+                            GetBankData(getIntent().getStringExtra("defaultBank"));
                         }
                         catch(Exception ex){
                             // banks = new String[0];
@@ -113,6 +119,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected Void GetBankData(String bankName) {
+        setTitle(bankName);
+        currentBank = bankName;
         RequestQueue rq = MySingleton.getInstance(getApplicationContext()).getRequestQueue();
         GsonRequest<Bank> gr = new GsonRequest<Bank>(Request.Method.GET, Bank.class,
                 String.format("%sbanks/%s?PageNumber=1&StatusFilter=&CategoryFilter=&ShowFutureItems=true", getApplicationContext().getResources().getText(R.string.url), bankName),
@@ -125,6 +133,11 @@ public class MainActivity extends AppCompatActivity
 
                             TextView current = (TextView) findViewById(R.id.currentBalance);
                             current.setText(String.format("%.2f%n", response.getTotal().getClearedBalance()));
+
+                            ListView lv = (ListView) findViewById(R.id.transactions);
+
+                            BankItemAdapter adapter = new BankItemAdapter(getApplicationContext(), response.getTransactions());
+                            lv.setAdapter(adapter);
                         }
                         catch(Exception ex){
                             // banks = new String[0];
@@ -185,6 +198,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -194,9 +209,23 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        GetBankData(item.getTitle().toString());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case ADD_TRANSACTION_CLOSED: {
+
+                  GetBankData(currentBank);
+
+                break;
+            }
+        }
     }
 }
