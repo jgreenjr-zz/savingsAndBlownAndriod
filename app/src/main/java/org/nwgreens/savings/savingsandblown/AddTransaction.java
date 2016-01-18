@@ -24,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ public class AddTransaction extends AppCompatActivity {
 
     Spinner sr;
 
+    Transaction currentTransaction = new Transaction();
+
     String[] status = {"Pending", "Cleared"};
     String[] type = {"widthdrawl", "deposit"};
     private Spinner spType;
@@ -51,8 +54,8 @@ public class AddTransaction extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        final Intent currentIntent = getIntent();
 
-        currentBank = getIntent().getStringExtra("currentBank").replace("\n", "");
 
         setTitle("Add Transaction");
 
@@ -63,6 +66,7 @@ public class AddTransaction extends AppCompatActivity {
         etPayee = (EditText) findViewById(R.id.Payee);
         swTipNeeded = (Switch) findViewById(R.id.Flag);
 
+
         ArrayAdapter spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,status);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sr.setAdapter(spinnerAdapter);
@@ -70,6 +74,20 @@ public class AddTransaction extends AppCompatActivity {
         ArrayAdapter spinnerAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,type);
         spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spType.setAdapter(spinnerAdapter2);
+
+        currentBank = currentIntent.getStringExtra("currentBank").replace("\n", "");
+        if(currentIntent.hasExtra("editedGson")){
+            String gson = currentIntent.getStringExtra("editedGson");
+            currentTransaction = new Gson().fromJson(gson, Transaction.class);
+
+            sr.setSelection(Arrays.asList(status).indexOf(currentTransaction.getStatus()));
+            spType.setSelection(Arrays.asList(type).indexOf(currentTransaction.getType()));
+            etDate.setText(currentTransaction.getDate());
+            etAmount.setText(String.format("%.2f%n", currentTransaction.getAmount()));
+            etPayee.setText(currentTransaction.getPayee());
+            swTipNeeded.setChecked(currentTransaction.isTipNeeded());
+        }
+
 
         Button btnAdd = (Button) findViewById(R.id.Save);
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -99,16 +117,16 @@ public class AddTransaction extends AppCompatActivity {
                 ) {
                     @Override
                     public byte[] getBody() throws AuthFailureError {
-                        Transaction t = new Transaction();
 
-                        t.setAmount(Double.parseDouble(etAmount.getText().toString()));
-                        t.setDate(etDate.getText().toString());
-                        t.setPayee(etPayee.getText().toString());
-                        t.setStatus(status[sr.getSelectedItemPosition()]);
-                        t.setType(type[spType.getSelectedItemPosition()]);
-                        t.setTipNeeded(swTipNeeded.isChecked());
+                        currentTransaction.setAmount(Double.parseDouble(etAmount.getText().toString()));
+                        currentTransaction.setDate(etDate.getText().toString());
+                        currentTransaction.setPayee(etPayee.getText().toString());
+                        currentTransaction.setStatus(status[sr.getSelectedItemPosition()]);
+                        currentTransaction.setType(type[spType.getSelectedItemPosition()]);
+                        currentTransaction.setTipNeeded(swTipNeeded.isChecked());
+                        currentTransaction.setBalance(null);
                         Gson g = new Gson();
-                        String s = g.toJson(t);
+                        String s = g.toJson(currentTransaction);
                         return s.getBytes();
                     }
                     @Override

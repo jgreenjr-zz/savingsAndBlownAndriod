@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="org.nwgreens.savings.savingsandblown.FilterSettings"
+    tools:showIn="@layout/activity_filter_settings"
+    android:orientation="vertical">
+
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow android:id="@+id/currentOnly"
+            android:background="@drawable/top_cell_shape">
+            <ImageView
+                android:id="@+id/img"
+                android:src="@android:drawable/radiobutton_off_background" />
+            <TextView
+                android:text="@string/currentOnly"/>
+        </TableRow>
+        <TableRow android:id="@+id/NextSeven"
+            android:background="@drawable/cell_shape">
+            <ImageView
+                android:id="@id/img"
+                android:src="@android:drawable/radiobutton_off_background"/>
+            <TextView
+                android:text="@string/NextSeven"/>
+        </TableRow>
+        <TableRow android:id="@+id/allTransactions"  android:background="@drawable/bottom_cell_shape">
+            <ImageView
+                android:id="@id/img"
+                android:src="@android:drawable/radiobutton_off_background"/>
+            <TextView
+                android:text="@string/allTransactions"/>
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow android:id="@+id/currentBalance"
+            android:background="@drawable/top_cell_shape">
+            <ImageView
+                android:id="@id/img"
+                android:src="@android:drawable/radiobutton_off_background" />
+            <TextView
+                android:text="@string/currentBalance"/>
+        </TableRow>
+        <TableRow android:id="@+id/actualBalance"
+            android:background="@drawable/bottom_cell_shape">
+            <ImageView
+                android:id="@id/img"
+                android:src="@android:drawable/radiobutton_off_background"/>
+            <TextView
+                android:text="@string/actualBalance"/>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

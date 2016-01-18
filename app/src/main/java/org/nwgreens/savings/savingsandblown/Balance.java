@@ -19,4 +19,14 @@ public class Balance{
     public void setClearedBalance(double clearedBalance) {
         ClearedBalance = clearedBalance;
     }
+
+    public double getBalance(int displayMode) {
+        switch(displayMode){
+            case R.id.currentBalance:
+                return getClearedBalance();
+            default:
+                return getActualBalance();
+
+        }
+    }
 }

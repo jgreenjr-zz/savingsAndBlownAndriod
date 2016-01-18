@@ -115,5 +115,12 @@ public class Transaction {
     public boolean isTipNeeded() {
         return TipNeeded;
     }
+
+    public String getPayeeView() {
+       if(payee.length() > 20){
+           return payee.substring(0,20);
+       }
+        return payee;
+    }
 }
 
