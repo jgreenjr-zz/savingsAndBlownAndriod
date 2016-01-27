@@ -3,13 +3,17 @@ package org.nwgreens.savings.savingsandblown;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -50,7 +54,9 @@ import org.json.JSONObject;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookieStore;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +80,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+
+    SharedPreferences myPrefFile;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -87,7 +95,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     public CookieManager mCookieManager;
 
+    public void ManuallyStartService(View v){
 
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +106,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        myPrefFile = getSharedPreferences("MyPrefFile", 0);
 
         mPasswordView = (EditText) findViewById(R.id.password);
 
@@ -109,6 +121,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
         });
+
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -365,10 +378,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 JSONObject jsonObject = new JSONObject(response);
 
                                 i.putExtra("SessionId", mCookieManager.getCookieStore().getCookies().get(0).toString());
-                                i.putExtra("email", jsonObject.getString("username") );
+                                i.putExtra("email", jsonObject.getString("username"));
                                 i.putExtra("defaultBank", jsonObject.getString("defaultBank"));
+                                SharedPreferences.Editor editor = myPrefFile.edit();
+
+                                SimpleDateFormat sdf = new SimpleDateFormat();
+                                String loginTime = sdf.format(new Date());
+
+                                editor.putString("LoginTime", loginTime);
+                                editor.apply();
+                                editor.commit();
 
                                 startActivity(i);
+
                             }
                             catch(JSONException js){
 

@@ -24,7 +24,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +76,9 @@ public class AddTransaction extends AppCompatActivity {
         ArrayAdapter spinnerAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,type);
         spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spType.setAdapter(spinnerAdapter2);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        etDate.setText(sdf.format(new Date()));
 
         currentBank = currentIntent.getStringExtra("currentBank").replace("\n", "");
         if(currentIntent.hasExtra("editedGson")){

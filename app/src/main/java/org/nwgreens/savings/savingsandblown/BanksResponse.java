@@ -18,9 +18,26 @@ public class BanksResponse {
         return returnValue;
     }
 
+    public Bank GetBankDetail(String bankName){
+        for(int i= 0; i < banks.length; i++){
+            if(banks[i].bankName == bankName){
+                return banks[i];
+            }
+        }
+        return null;
+    }
+
     public class Bank{
         private String bankName;
         private String BudgetStartDate;
-        private String BudgetStartEndDate;
+        private String BudgetEndDate;
+
+        public String getBudgetStartDate() {
+            return BudgetStartDate;
+        }
+
+        public String getBudgetStartEndDate() {
+            return BudgetEndDate;
+        }
     }
 }

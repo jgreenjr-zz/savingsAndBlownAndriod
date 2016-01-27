@@ -14,52 +14,67 @@
     android:orientation="vertical">
 
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <TableRow android:id="@+id/currentOnly"
-            android:background="@drawable/top_cell_shape">
-            <ImageView
-                android:id="@+id/img"
-                android:src="@android:drawable/radiobutton_off_background" />
-            <TextView
-                android:text="@string/currentOnly"/>
-        </TableRow>
-        <TableRow android:id="@+id/NextSeven"
-            android:background="@drawable/cell_shape">
-            <ImageView
-                android:id="@id/img"
-                android:src="@android:drawable/radiobutton_off_background"/>
-            <TextView
-                android:text="@string/NextSeven"/>
-        </TableRow>
-        <TableRow android:id="@+id/allTransactions"  android:background="@drawable/bottom_cell_shape">
-            <ImageView
-                android:id="@id/img"
-                android:src="@android:drawable/radiobutton_off_background"/>
-            <TextView
-                android:text="@string/allTransactions"/>
-        </TableRow>
-    </TableLayout>
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <TableRow android:id="@+id/currentBalance"
-            android:background="@drawable/top_cell_shape">
-            <ImageView
-                android:id="@id/img"
-                android:src="@android:drawable/radiobutton_off_background" />
-            <TextView
-                android:text="@string/currentBalance"/>
-        </TableRow>
-        <TableRow android:id="@+id/actualBalance"
-            android:background="@drawable/bottom_cell_shape">
-            <ImageView
-                android:id="@id/img"
-                android:src="@android:drawable/radiobutton_off_background"/>
-            <TextView
-                android:text="@string/actualBalance"/>
-        </TableRow>
-    </TableLayout>
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:background="@drawable/cell_shape"
+        android:id="@+id/DateFilter">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/DateFilter"/>
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/allTransactions" android:text="@string/allTransactions"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/NextSeven" android:text="@string/NextSeven"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/currentOnly" android:text="@string/currentOnly"/>
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/filter_budgeted" android:text="@string/filter_budgeted"/>
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:background="@drawable/cell_shape"
+        android:id="@+id/filterState">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/StateFilter"/>
+        <RadioButton
+            android:layout_width="wrap_content" android:id="@+id/AllState"
+            android:layout_height="wrap_content" android:text="@string/AllState" />
+        <RadioButton
+            android:layout_width="wrap_content"  android:id="@+id/StatePending"
+            android:layout_height="wrap_content" android:text="@string/Pending"/>
+        <RadioButton
+            android:layout_width="wrap_content" android:id="@+id/StateCleared"
+            android:layout_height="wrap_content" android:text="@string/Cleared"/>
+    </RadioGroup>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:background="@drawable/cell_shape"
+        android:id="@+id/balanceDisplay">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="@string/ValueFilter"/>
+        <RadioButton android:id="@+id/currentBalance"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/currentBalance"/>
+        <RadioButton android:id="@+id/actualBalance"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/actualBalance"/>
+
+    </RadioGroup>
 </LinearLayout>

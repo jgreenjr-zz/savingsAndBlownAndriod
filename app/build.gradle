@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.1.0'
     compile project(':volley')
     compile 'com.google.code.gson:gson:2.4'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

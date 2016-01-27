@@ -2,13 +2,19 @@ package org.nwgreens.savings.savingsandblown;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.internal.view.menu.MenuBuilder;
 import android.view.SubMenu;
 import android.view.View;
@@ -33,6 +39,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -42,6 +51,8 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +64,13 @@ public class MainActivity extends AppCompatActivity
     public ListView lvBanks;
     SharedPreferences myPrefFile;
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+    private BanksResponse banksResponse;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,14 +78,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-        myPrefFile= getSharedPreferences("MyPrefFile", 0);
+        myPrefFile = getSharedPreferences("MyPrefFile", 0);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Intent i = new Intent(getApplicationContext(), AddTransaction.class);
-                i.putExtra("currentBank", currentBank );
+                Intent i = new Intent(getApplicationContext(), AddTransaction.class);
+                i.putExtra("currentBank", currentBank);
 
                 startActivityForResult(i, ADD_TRANSACTION_CLOSED);
             }
@@ -84,7 +102,9 @@ public class MainActivity extends AppCompatActivity
         SetupNavigationTray();
 
 
-
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void SetupNavigationTray() {
@@ -102,23 +122,24 @@ public class MainActivity extends AppCompatActivity
                     public void onResponse(BanksResponse response) {
                         try {
                             String[] banks = response.GetBanks();
+                            banksResponse = response;
                             Menu m = navigationView.getMenu();
                             SubMenu subMenu = m.addSubMenu(Menu.NONE, Menu.NONE, 1, "Banks");
-                            for(int i = 0; i < banks.length; i++){
+                            for (int i = 0; i < banks.length; i++) {
                                 subMenu.add(banks[i]);
                             }
 
                             GetBankData(getIntent().getStringExtra("defaultBank"));
-                        }
-                        catch(Exception ex){
+                        } catch (Exception ex) {
                             // banks = new String[0];
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast t = Toast.makeText(getApplicationContext(), "Error getting banks", Toast.LENGTH_LONG);
+                Toast t = Toast.makeText(getApplicationContext(), "Log back in to continue", Toast.LENGTH_LONG);
                 t.show();
+                finish();
             }
         }
 
@@ -130,7 +151,15 @@ public class MainActivity extends AppCompatActivity
     protected Void GetBankData(String bankName) {
         setTitle(bankName);
         currentBank = bankName;
+        BanksResponse.Bank bankDetail = banksResponse.GetBankDetail(bankName);
+
+        SharedPreferences.Editor edit = myPrefFile.edit();
+        edit.putString("budgetStartDate", bankDetail.getBudgetStartDate());
+        edit.putString("budgetEndDate", bankDetail.getBudgetStartEndDate());
+        edit.apply();
+
         RequestQueue rq = MySingleton.getInstance(getApplicationContext()).getRequestQueue();
+
         GsonRequest<Bank> gr = new GsonRequest<Bank>(Request.Method.GET, Bank.class,
                 String.format("%sbanks/%s?PageNumber=1&StatusFilter=&CategoryFilter=&ShowFutureItems=true", getApplicationContext().getResources().getText(R.string.url), bankName),
                 new Response.Listener<Bank>() {
@@ -140,7 +169,7 @@ public class MainActivity extends AppCompatActivity
                         try {
 
 
-                            int dateFilter = myPrefFile.getInt("DateFilter", R.id.currentOnly);
+
 
                             TextView actual = (TextView) findViewById(R.id.actualBalance);
                             actual.setText(String.format("%.2f%n", response.getTotal().getActualBalance()));
@@ -150,23 +179,23 @@ public class MainActivity extends AppCompatActivity
 
                             ListView lv = (ListView) findViewById(R.id.transactions);
 
-                            BankItemAdapter adapter = new BankItemAdapter(getApplicationContext(), response.getTransactions(dateFilter),
+                            BankItemAdapter adapter = new BankItemAdapter(getApplicationContext(), response.getTransactions(myPrefFile),
                                     myPrefFile.getInt("DisplayMode", R.id.actualBalance));
                             lv.setAdapter(adapter);
                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    String transactionJson = new Gson().toJson(response.getTransactions().get(position));
+                                    String transactionJson = new Gson().toJson(response.getTransactions(myPrefFile).get(position));
                                     Intent i = new Intent(getApplicationContext(), AddTransaction.class);
-                                    i.putExtra("currentBank", currentBank );
+                                    i.putExtra("currentBank", currentBank);
                                     i.putExtra("editedGson", transactionJson);
                                     startActivityForResult(i, ADD_TRANSACTION_CLOSED);
 
 
                                 }
-                            });;
-                        }
-                        catch(Exception ex){
+                            });
+                            ;
+                        } catch (Exception ex) {
                             // banks = new String[0];
                         }
                     }
@@ -230,7 +259,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -250,13 +278,53 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case ADD_TRANSACTION_CLOSED: {
 
-                  GetBankData(currentBank);
+                GetBankData(currentBank);
 
                 break;
             }
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://org.nwgreens.savings.savingsandblown/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://org.nwgreens.savings.savingsandblown/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 }

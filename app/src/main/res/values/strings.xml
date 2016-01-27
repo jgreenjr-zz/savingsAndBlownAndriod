@@ -31,4 +31,11 @@
     <string name="currentOnly">Current Transactions</string>
     <string name="NextSeven">Next 7 Days</string>
     <string name="allTransactions">All Transactions</string>
+    <string name="ValueFilter">Display Balance As</string>
+    <string name="DateFilter">Show Only</string>
+    <string name="AllState">All Transactions</string>
+    <string name="Pending">Pending</string>
+    <string name="Cleared">Cleared</string>
+    <string name="StateFilter">Only in State</string>
+    <string name="filter_budgeted">Current Budget Only</string>
 </resources>
