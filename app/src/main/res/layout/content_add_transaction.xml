@@ -18,7 +18,7 @@
         <TableRow
             android:background="@drawable/top_cell_shape">
             <TextView
-                android:text="Date"/>
+                android:text="@string/TransactionDate"/>
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         <TableRow
             android:background="@drawable/cell_shape">
             <TextView
-                android:text="Amount"/>
+                android:text="@string/TransactionAmount"/>
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         <TableRow
             android:background="@drawable/cell_shape">
             <TextView
-                android:text="Status"/>
+                android:text="@string/TransactionStatus"/>
             <Spinner
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -64,11 +64,21 @@
         <TableRow
             android:background="@drawable/cell_shape">
             <TextView
-                android:text="Type"/>
+                android:text="@string/TransactionType"/>
             <Spinner
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Type"/>
+
+        </TableRow>
+        <TableRow
+            android:background="@drawable/cell_shape">
+            <TextView
+                android:text="@string/Category"/>
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Categories"/>
 
         </TableRow>
         <TableRow
@@ -80,7 +90,7 @@
                 <Switch android:id="@+id/Flag"
                    android:layout_width="fill_parent"
                    android:layout_height="wrap_content" android:text=""/>
-                   <TextView android:text="Need More Information"
+                   <TextView android:text="@string/TransactionFlagStatus"
                        android:textSize="20sp"/>
                </TableRow>
            </TableLayout>

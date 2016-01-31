@@ -38,4 +38,11 @@
     <string name="Cleared">Cleared</string>
     <string name="StateFilter">Only in State</string>
     <string name="filter_budgeted">Current Budget Only</string>
+    <string name="TransactionDate">Date</string>
+    <string name="TransactionAmount">Amount</string>
+    <string name="TransactionStatus">Status</string>
+    <string name="TransactionType">Type</string>
+    <string name="TransactionFlagStatus">Need More Information</string>
+    <string name="TransactionBalance">Balance</string>
+    <string name="Category">Category</string>
 </resources>

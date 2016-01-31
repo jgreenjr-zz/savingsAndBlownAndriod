@@ -50,6 +50,9 @@ public class AddTransaction extends AppCompatActivity {
     String[] type = {"widthdrawl", "deposit"};
     private Spinner spType;
 
+    private Spinner spCategories;
+    private String[] categories;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +66,7 @@ public class AddTransaction extends AppCompatActivity {
 
         sr = (Spinner) findViewById(R.id.Status);
         spType = (Spinner) findViewById(R.id.Type);
+        spCategories = (Spinner) findViewById(R.id.Categories);
         etDate = (EditText) findViewById(R.id.Date);
         etAmount = (EditText) findViewById(R.id.Amount);
         etPayee = (EditText) findViewById(R.id.Payee);
@@ -81,6 +85,17 @@ public class AddTransaction extends AppCompatActivity {
         etDate.setText(sdf.format(new Date()));
 
         currentBank = currentIntent.getStringExtra("currentBank").replace("\n", "");
+
+        if(currentIntent.hasExtra("categories")){
+            String gson = currentIntent.getStringExtra("categories");
+            CategoriesResponse categoriesResponse = new Gson().fromJson(gson, CategoriesResponse.class);
+            categories = categoriesResponse.GetCategoryString();
+            ArrayAdapter spinnerAdapter3 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,categories);
+            spinnerAdapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spCategories.setAdapter(spinnerAdapter3);
+
+        }
+
         if(currentIntent.hasExtra("editedGson")){
             String gson = currentIntent.getStringExtra("editedGson");
             currentTransaction = new Gson().fromJson(gson, Transaction.class);
@@ -91,6 +106,7 @@ public class AddTransaction extends AppCompatActivity {
             etAmount.setText(String.format("%.2f%n", currentTransaction.getAmount()));
             etPayee.setText(currentTransaction.getPayee());
             swTipNeeded.setChecked(currentTransaction.isTipNeeded());
+            spCategories.setSelection(Arrays.asList(categories).indexOf(currentTransaction.getCategory()));
         }
 
 
@@ -104,8 +120,15 @@ public class AddTransaction extends AppCompatActivity {
                         String.format("%sbanks/%s", getApplicationContext().getResources().getText(R.string.url), currentBank), new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Toast t = Toast.makeText(getApplicationContext(), String.format("%s added!", etPayee.getText()), Toast.LENGTH_LONG);
-                                t.show();
+                        if(currentTransaction.getId().equals("")) {
+                            Toast t = Toast.makeText(getApplicationContext(), String.format("%s added!", etPayee.getText()), Toast.LENGTH_LONG);
+
+                            t.show();
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(), String.format("%s Updated!", etPayee.getText()), Toast.LENGTH_LONG).show();
+                        }
+
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("currentBank", currentBank);
                         setResult(Activity.RESULT_OK, resultIntent);
@@ -129,6 +152,7 @@ public class AddTransaction extends AppCompatActivity {
                         currentTransaction.setStatus(status[sr.getSelectedItemPosition()]);
                         currentTransaction.setType(type[spType.getSelectedItemPosition()]);
                         currentTransaction.setTipNeeded(swTipNeeded.isChecked());
+                        currentTransaction.setCategory(categories[spCategories.getSelectedItemPosition()]);
                         currentTransaction.setBalance(null);
                         Gson g = new Gson();
                         String s = g.toJson(currentTransaction);

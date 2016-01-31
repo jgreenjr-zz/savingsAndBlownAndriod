@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     public NavigationView navigationView;
     public String currentBank;
     public ListView lvBanks;
+    CategoriesResponse CategoriesResponse;
     SharedPreferences myPrefFile;
 
     /**
@@ -86,7 +87,8 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), AddTransaction.class);
                 i.putExtra("currentBank", currentBank);
-
+                String categories = new Gson().toJson(CategoriesResponse);
+                i.putExtra("categories", categories);
                 startActivityForResult(i, ADD_TRANSACTION_CLOSED);
             }
         });
@@ -151,6 +153,14 @@ public class MainActivity extends AppCompatActivity
     protected Void GetBankData(String bankName) {
         setTitle(bankName);
         currentBank = bankName;
+
+        CategoriesResponse.GetCategories(getApplicationContext(), bankName, new Response.Listener<CategoriesResponse>() {
+            @Override
+            public void onResponse(CategoriesResponse response) {
+                CategoriesResponse = response;
+            }
+        });
+
         BanksResponse.Bank bankDetail = banksResponse.GetBankDetail(bankName);
 
         SharedPreferences.Editor edit = myPrefFile.edit();
@@ -186,9 +196,12 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                     String transactionJson = new Gson().toJson(response.getTransactions(myPrefFile).get(position));
+                                    String categories = new Gson().toJson(CategoriesResponse);
+
                                     Intent i = new Intent(getApplicationContext(), AddTransaction.class);
                                     i.putExtra("currentBank", currentBank);
                                     i.putExtra("editedGson", transactionJson);
+                                    i.putExtra("categories", categories);
                                     startActivityForResult(i, ADD_TRANSACTION_CLOSED);
 
 

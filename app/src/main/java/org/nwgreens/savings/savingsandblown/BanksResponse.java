@@ -20,7 +20,7 @@ public class BanksResponse {
 
     public Bank GetBankDetail(String bankName){
         for(int i= 0; i < banks.length; i++){
-            if(banks[i].bankName == bankName){
+            if(banks[i].bankName.equals( bankName)){
                 return banks[i];
             }
         }

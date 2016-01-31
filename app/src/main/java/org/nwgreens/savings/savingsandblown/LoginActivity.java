@@ -60,6 +60,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView mLastLogin;
 
     public CookieManager mCookieManager;
 
@@ -105,9 +107,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mLastLogin = (TextView) findViewById(R.id.LastLoginInfo);
+
         populateAutoComplete();
 
         myPrefFile = getSharedPreferences("MyPrefFile", 0);
+
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        String loginTime = myPrefFile.getString("LoginTime", "1/1/1900");
+
+        if(!loginTime.equals("1/1/1900")){
+            mLastLogin.setText(String.format("Last Login: %s", loginTime));
+        }
+
+
 
         mPasswordView = (EditText) findViewById(R.id.password);
 
@@ -135,6 +148,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
         mCookieManager = new CookieManager();
         CookieHandler.setDefault(mCookieManager);
+
     }
 
     private void populateAutoComplete() {
